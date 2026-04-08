@@ -97,6 +97,37 @@ main { padding: 32px 0 60px; min-height: 70vh; }
   margin-bottom: 36px;
   line-height: 1.7;
 }
+.mode-picker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.mode-btn {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 16px;
+  text-align: center;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.mode-btn:hover { border-color: var(--green-light); }
+.mode-btn.active {
+  border-color: var(--green);
+  background: var(--green-pale);
+  box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.15);
+}
+.mode-icon { font-size: 2rem; }
+.mode-label { font-size: 1rem; font-weight: 700; color: var(--text); }
+.mode-desc { font-size: 0.8rem; color: var(--text-muted); }
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 .pref-section {
   background: var(--card);
   border-radius: var(--radius);
