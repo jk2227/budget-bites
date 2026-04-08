@@ -26,8 +26,8 @@ def spoonacular_get(path, params=None):
     try:
         with urlopen(req, timeout=10) as resp:
             return json.loads(resp.read().decode())
-    except Exception:
-        return None
+    except Exception as e:
+        return {"_error": str(e)}
 
 
 def normalize_spoonacular_recipe(raw):
