@@ -469,40 +469,79 @@ main { padding: 32px 0 60px; min-height: 70vh; }
   color: var(--text-muted);
 }
 .list-empty .icon { font-size: 3rem; margin-bottom: 16px; }
-.list-recipe-group {
-  background: var(--card);
-  border-radius: var(--radius);
-  padding: 20px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
-}
-.list-recipe-header {
+.list-recipes-summary {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
 }
-.list-recipe-header h3 { font-size: 1.05rem; font-weight: 700; }
-.btn-remove {
-  background: none;
-  border: none;
-  color: var(--orange);
+.list-recipe-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--green-pale);
+  color: var(--green);
+  padding: 6px 12px;
+  border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 600;
 }
-.checklist { list-style: none; }
-.checklist li {
+.btn-remove-small {
+  background: none;
+  border: none;
+  color: var(--green);
+  font-weight: 700;
+  font-size: 0.85rem;
+  opacity: 0.6;
+  padding: 0 2px;
+}
+.btn-remove-small:hover { opacity: 1; }
+.ingredient-row {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 14px 20px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow);
+  transition: opacity 0.2s;
+}
+.ingredient-row.checked { opacity: 0.5; }
+.ingredient-main {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 0;
-  font-size: 0.95rem;
+  gap: 12px;
 }
-.checklist input[type="checkbox"] {
+.ingredient-main input[type="checkbox"] {
   accent-color: var(--green);
   width: 18px;
   height: 18px;
   flex-shrink: 0;
+}
+.ingredient-name {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.ingredient-row.checked .ingredient-name {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+.ingredient-sources {
+  margin-left: 30px;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.ingredient-source {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.source-recipe {
+  font-size: 0.8rem;
+  color: var(--green-light);
+  opacity: 0.8;
 }
 .checklist li.checked span {
   text-decoration: line-through;

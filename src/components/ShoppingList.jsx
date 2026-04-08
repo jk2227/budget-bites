@@ -29,16 +29,41 @@ export default function ShoppingList({
     );
   }
 
-  function buildPlainText() {
-    let text = "Ingredient List\n================\n\n";
+  // Consolidate ingredients across recipes, grouped by normalized name
+  function buildConsolidated() {
+    const map = new Map(); // normalized name -> { name, sources: [{ recipe, amount }] }
+
     items.forEach((recipe) => {
       const ingredients = recipe.ingredients || [];
-      text += `${recipe.title}\n`;
-      text += "-".repeat(recipe.title.length) + "\n";
-      ingredients.forEach((ing, idx) => {
-        const key = `${recipe.id}-${idx}`;
-        const mark = checked[key] ? "[x]" : "[ ]";
-        text += `${mark} ${ing.name} — ${ing.amount}\n`;
+      ingredients.forEach((ing) => {
+        const key = ing.name.toLowerCase().trim();
+        if (!map.has(key)) {
+          map.set(key, { name: ing.name, sources: [] });
+        }
+        map.get(key).sources.push({
+          recipeId: recipe.id,
+          recipeTitle: recipe.title,
+          recipeEmoji: recipe.emoji || "\ud83c\udf7d\ufe0f",
+          amount: ing.amount,
+        });
+      });
+    });
+
+    return Array.from(map.values()).sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+  }
+
+  const consolidated = buildConsolidated();
+
+  function buildPlainText() {
+    let text = "Ingredient List\n================\n\n";
+    consolidated.forEach((item) => {
+      const checkKey = item.name.toLowerCase().trim();
+      const mark = checked[checkKey] ? "[x]" : "[ ]";
+      text += `${mark} ${item.name}\n`;
+      item.sources.forEach((s) => {
+        text += `    - ${s.amount} (${s.recipeTitle})\n`;
       });
       text += "\n";
     });
@@ -60,7 +85,9 @@ export default function ShoppingList({
       const btn = document.getElementById("copy-btn");
       if (btn) {
         btn.textContent = "Copied!";
-        setTimeout(() => { btn.textContent = "Copy to Clipboard"; }, 2000);
+        setTimeout(() => {
+          btn.textContent = "Copy to Clipboard";
+        }, 2000);
       }
     });
   }
@@ -72,47 +99,61 @@ export default function ShoppingList({
           Your Ingredient List
         </h2>
         <div className="list-actions">
-          <button className="btn-action" onClick={handlePrint}>Print</button>
-          <button className="btn-action" onClick={handleEmail}>Email</button>
-          <button className="btn-action" id="copy-btn" onClick={handleCopy}>Copy to Clipboard</button>
+          <button className="btn-action" onClick={handlePrint}>
+            Print
+          </button>
+          <button className="btn-action" onClick={handleEmail}>
+            Email
+          </button>
+          <button className="btn-action" id="copy-btn" onClick={handleCopy}>
+            Copy to Clipboard
+          </button>
         </div>
       </div>
 
-      <div id="printable-list">
-        {items.map((recipe) => {
-          const ingredients = recipe.ingredients || [];
+      <div className="list-recipes-summary">
+        {items.map((recipe) => (
+          <div key={recipe.id} className="list-recipe-tag">
+            <span>
+              {recipe.emoji || "\ud83c\udf7d\ufe0f"} {recipe.title}
+            </span>
+            <button
+              className="btn-remove-small no-print"
+              onClick={() => onRemoveRecipe(recipe.id)}
+            >
+              x
+            </button>
+          </div>
+        ))}
+      </div>
 
+      <div id="printable-list">
+        {consolidated.map((item) => {
+          const checkKey = item.name.toLowerCase().trim();
+          const isChecked = checked[checkKey];
           return (
-            <div key={recipe.id} className="list-recipe-group">
-              <div className="list-recipe-header">
-                <h3>
-                  {recipe.emoji || "\ud83c\udf7d\ufe0f"} {recipe.title}
-                </h3>
-                <button
-                  className="btn-remove no-print"
-                  onClick={() => onRemoveRecipe(recipe.id)}
-                >
-                  Remove
-                </button>
+            <div
+              key={checkKey}
+              className={`ingredient-row ${isChecked ? "checked" : ""}`}
+            >
+              <div className="ingredient-main">
+                <input
+                  type="checkbox"
+                  checked={!!isChecked}
+                  onChange={() => onToggleCheck(checkKey)}
+                />
+                <span className="ingredient-name">{item.name}</span>
               </div>
-              <ul className="checklist">
-                {ingredients.map((ing, idx) => {
-                  const key = `${recipe.id}-${idx}`;
-                  const isChecked = checked[key];
-                  return (
-                    <li key={key} className={isChecked ? "checked" : ""}>
-                      <input
-                        type="checkbox"
-                        checked={!!isChecked}
-                        onChange={() => onToggleCheck(key)}
-                      />
-                      <span>
-                        {ing.name} &mdash; {ing.amount}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
+              <div className="ingredient-sources">
+                {item.sources.map((s, i) => (
+                  <span key={i} className="ingredient-source">
+                    {s.amount}
+                    <span className="source-recipe">
+                      {s.recipeEmoji} {s.recipeTitle}
+                    </span>
+                  </span>
+                ))}
+              </div>
             </div>
           );
         })}
