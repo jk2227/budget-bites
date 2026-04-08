@@ -53,7 +53,7 @@ export default function App() {
               className={screen === "list" ? "active" : ""}
               onClick={() => navigate("list")}
             >
-              Shopping List
+              Ingredients
               {items.length > 0 && (
                 <span className="cart-count">{items.length}</span>
               )}
@@ -89,7 +89,6 @@ export default function App() {
           <ShoppingList
             items={items}
             checked={checked}
-            servings={servings}
             onToggleCheck={toggleCheck}
             onRemoveRecipe={removeRecipe}
             onBrowse={() => navigate("browse")}

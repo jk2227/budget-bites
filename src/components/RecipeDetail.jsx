@@ -175,7 +175,7 @@ export default function RecipeDetail({
             : onAddToList(recipe)
         }
       >
-        {isInList ? "Remove from Shopping List" : "Add to Shopping List"}
+        {isInList ? "Remove from Ingredient List" : "Add Ingredients to List"}
       </button>
     </div>
   );

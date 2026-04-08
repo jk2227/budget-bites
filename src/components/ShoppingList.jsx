@@ -1,7 +1,6 @@
 export default function ShoppingList({
   items,
   checked,
-  servings,
   onToggleCheck,
   onRemoveRecipe,
   onBrowse,
@@ -10,11 +9,11 @@ export default function ShoppingList({
     return (
       <div>
         <h2 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: 24 }}>
-          Your Shopping List
+          Your Ingredient List
         </h2>
         <div className="list-empty">
           <div className="icon">:)</div>
-          <p>Your shopping list is empty.</p>
+          <p>Your ingredient list is empty.</p>
           <p style={{ marginTop: 8, fontSize: "0.9rem" }}>
             Browse recipes and add ones you like!
           </p>
@@ -30,68 +29,93 @@ export default function ShoppingList({
     );
   }
 
-  let grandTotal = 0;
+  function buildPlainText() {
+    let text = "Ingredient List\n================\n\n";
+    items.forEach((recipe) => {
+      const ingredients = recipe.ingredients || [];
+      text += `${recipe.title}\n`;
+      text += "-".repeat(recipe.title.length) + "\n";
+      ingredients.forEach((ing, idx) => {
+        const key = `${recipe.id}-${idx}`;
+        const mark = checked[key] ? "[x]" : "[ ]";
+        text += `${mark} ${ing.name} — ${ing.amount}\n`;
+      });
+      text += "\n";
+    });
+    return text;
+  }
+
+  function handlePrint() {
+    window.print();
+  }
+
+  function handleEmail() {
+    const body = encodeURIComponent(buildPlainText());
+    const subject = encodeURIComponent("My Budget Bites Ingredient List");
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  }
+
+  function handleCopy() {
+    navigator.clipboard.writeText(buildPlainText()).then(() => {
+      const btn = document.getElementById("copy-btn");
+      if (btn) {
+        btn.textContent = "Copied!";
+        setTimeout(() => { btn.textContent = "Copy to Clipboard"; }, 2000);
+      }
+    });
+  }
 
   return (
     <div>
-      <h2 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: 24 }}>
-        Your Shopping List
-      </h2>
+      <div className="list-header">
+        <h2 style={{ fontSize: "1.5rem", fontWeight: 700 }}>
+          Your Ingredient List
+        </h2>
+        <div className="list-actions">
+          <button className="btn-action" onClick={handlePrint}>Print</button>
+          <button className="btn-action" onClick={handleEmail}>Email</button>
+          <button className="btn-action" id="copy-btn" onClick={handleCopy}>Copy to Clipboard</button>
+        </div>
+      </div>
 
-      {items.map((recipe) => {
-        const scale = servings / (recipe.servings || 1);
-        const ingredients = recipe.ingredients || [];
-        const recipeTotal = ingredients.reduce(
-          (sum, i) => sum + (i.price || 0) * scale,
-          0
-        );
-        grandTotal += recipeTotal;
+      <div id="printable-list">
+        {items.map((recipe) => {
+          const ingredients = recipe.ingredients || [];
 
-        return (
-          <div key={recipe.id} className="list-recipe-group">
-            <div className="list-recipe-header">
-              <h3>
-                {recipe.emoji || "🍽️"} {recipe.title}
-              </h3>
-              <button
-                className="btn-remove"
-                onClick={() => onRemoveRecipe(recipe.id)}
-              >
-                Remove
-              </button>
+          return (
+            <div key={recipe.id} className="list-recipe-group">
+              <div className="list-recipe-header">
+                <h3>
+                  {recipe.emoji || "\ud83c\udf7d\ufe0f"} {recipe.title}
+                </h3>
+                <button
+                  className="btn-remove no-print"
+                  onClick={() => onRemoveRecipe(recipe.id)}
+                >
+                  Remove
+                </button>
+              </div>
+              <ul className="checklist">
+                {ingredients.map((ing, idx) => {
+                  const key = `${recipe.id}-${idx}`;
+                  const isChecked = checked[key];
+                  return (
+                    <li key={key} className={isChecked ? "checked" : ""}>
+                      <input
+                        type="checkbox"
+                        checked={!!isChecked}
+                        onChange={() => onToggleCheck(key)}
+                      />
+                      <span>
+                        {ing.name} &mdash; {ing.amount}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
-            <ul className="checklist">
-              {ingredients.map((ing, idx) => {
-                const key = `${recipe.id}-${idx}`;
-                const isChecked = checked[key];
-                return (
-                  <li key={key} className={isChecked ? "checked" : ""}>
-                    <input
-                      type="checkbox"
-                      checked={!!isChecked}
-                      onChange={() => onToggleCheck(key)}
-                    />
-                    <span>
-                      {ing.name} &mdash; {ing.amount}
-                      {ing.price != null &&
-                        ` ($${(ing.price * scale).toFixed(2)})`}
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        );
-      })}
-
-      <div className="list-total">
-        Estimated Total
-        <br />
-        <span className="total-amount">${grandTotal.toFixed(2)}</span>
-        <br />
-        <span style={{ fontSize: "0.85rem", opacity: 0.8 }}>
-          for {servings} servings per recipe
-        </span>
+          );
+        })}
       </div>
     </div>
   );

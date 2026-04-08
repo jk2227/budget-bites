@@ -415,7 +415,30 @@ main { padding: 32px 0 60px; min-height: 70vh; }
 .btn-add-list:hover { background: var(--orange-light); }
 .btn-add-list.added { background: var(--green); }
 
-/* ===== Shopping List ===== */
+/* ===== Ingredient List ===== */
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.list-actions { display: flex; gap: 8px; }
+.btn-action {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 2px solid var(--green);
+  background: white;
+  color: var(--green);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.btn-action:hover {
+  background: var(--green);
+  color: white;
+}
 .list-empty {
   text-align: center;
   padding: 60px 20px;
@@ -461,17 +484,13 @@ main { padding: 32px 0 60px; min-height: 70vh; }
   text-decoration: line-through;
   color: var(--text-muted);
 }
-.list-total {
-  background: var(--green);
-  color: white;
-  border-radius: var(--radius);
-  padding: 20px;
-  text-align: center;
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-top: 20px;
+/* ===== Print ===== */
+@media print {
+  header, footer, nav, .btn-primary, .btn-action, .btn-remove, .no-print, .list-actions { display: none !important; }
+  main { padding: 0; }
+  .list-recipe-group { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
+  .checklist input[type="checkbox"] { appearance: auto; }
 }
-.list-total .total-amount { font-size: 1.8rem; font-weight: 800; }
 
 /* ===== Loading ===== */
 .loading {
