@@ -77,10 +77,7 @@ class handler(BaseHTTPRequestHandler):
                     sp_params["sort"] = sort_map[sort]
 
             data = spoonacular_get("/recipes/complexSearch", sp_params)
-            if data and "_error" in data:
-                # Surface API errors for debugging
-                results.append({"id": "error", "title": "Spoonacular Error", "error": data["_error"]})
-            elif data:
+            if data:
                 for raw in data.get("results", []):
                     results.append(normalize_spoonacular_recipe(raw))
 

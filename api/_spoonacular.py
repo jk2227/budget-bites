@@ -22,12 +22,12 @@ def spoonacular_get(path, params=None):
     qs = urlencode(params)
     url = f"{SPOONACULAR_BASE}{path}?{qs}" if qs else f"{SPOONACULAR_BASE}{path}"
 
-    req = Request(url, headers={"x-api-key": key})
+    req = Request(url, headers={"x-api-key": key, "User-Agent": "BudgetBites/1.0"})
     try:
         with urlopen(req, timeout=10) as resp:
             return json.loads(resp.read().decode())
-    except Exception as e:
-        return {"_error": str(e)}
+    except Exception:
+        return None
 
 
 def normalize_spoonacular_recipe(raw):
