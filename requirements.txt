@@ -1,0 +1,1 @@
+# No third-party dependencies required — all API functions use Python stdlib only.
