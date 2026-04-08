@@ -14,7 +14,7 @@ export default function Browse({ preferences, onSelectRecipe }) {
     preferences.cuisine || ""
   );
   const [sort, setSort] = useState("price");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(preferences.query || "");
 
   useEffect(() => {
     fetchRecipes();
