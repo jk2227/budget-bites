@@ -4,6 +4,7 @@ import Browse from "./components/Browse";
 import RecipeDetail from "./components/RecipeDetail";
 import ShoppingList from "./components/ShoppingList";
 import { useShoppingList } from "./hooks/useShoppingList";
+import { Analytics } from "@vercel/analytics/react";
 import "./App.css";
 
 export default function App() {
@@ -99,6 +100,7 @@ export default function App() {
       <footer>
         <div className="container">Budget Bites — Simple meals, smart savings.</div>
       </footer>
+      <Analytics />
     </div>
   );
 }
