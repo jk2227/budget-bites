@@ -1,12 +1,36 @@
 import json
-import sys
 import os
 from http.server import BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
+from urllib.request import Request, urlopen
+from urllib.parse import urlparse, parse_qs, urlencode
+import importlib.util, pathlib
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from korean_recipes import KOREAN_RECIPES
-from _spoonacular import spoonacular_get, get_api_key
+_api_dir = pathlib.Path(__file__).resolve().parent.parent
+_spec = importlib.util.spec_from_file_location("korean_recipes", _api_dir / "korean_recipes.py")
+_mod = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_mod)
+KOREAN_RECIPES = _mod.KOREAN_RECIPES
+
+SPOONACULAR_BASE = "https://api.spoonacular.com"
+
+
+def get_api_key():
+    return os.environ.get("SPOONACULAR_API_KEY", "")
+
+
+def spoonacular_get(path, params=None):
+    key = get_api_key()
+    if not key:
+        return None
+    params = params or {}
+    qs = urlencode(params)
+    url = f"{SPOONACULAR_BASE}{path}?{qs}" if qs else f"{SPOONACULAR_BASE}{path}"
+    req = Request(url, headers={"x-api-key": key, "User-Agent": "BudgetBites/1.0"})
+    try:
+        with urlopen(req, timeout=10) as resp:
+            return json.loads(resp.read().decode())
+    except Exception:
+        return None
 
 
 class handler(BaseHTTPRequestHandler):
